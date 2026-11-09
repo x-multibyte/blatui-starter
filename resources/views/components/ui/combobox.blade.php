@@ -1,0 +1,425 @@
+@props([
+    'name' => null,
+    'options' => [],
+    'value' => '',
+    'placeholder' => null,        // translated trigger text; defaults via __() below (no hardcoded English)
+    'searchPlaceholder' => null,
+    'empty' => null,
+    'width' => 'w-[200px]',
+    'searchable' => true,         // false → a plain picker with no search box (button trigger only)
+    'disabled' => false,
+    'multiple' => false,          // true → pick many; selected render as removable chips, list stays open
+    'trigger' => 'button',        // button → popover w/ search inside | input → the field IS the search box (autocomplete)
+    'size' => 'default',          // sm | default | lg — input trigger only
+    'icon' => null,               // optional leading lucide icon name (input trigger only, e.g. "search")
+    'indicator' => 'check',       // check | checkbox | radio — how a selected option is marked in the list
+    'id' => null,                 // lands on the focusable control, so <label for="{id}"> names and focuses it
+    'remote' => false,            // true → options come from the server, a page at a time, via the combobox-fetch event
+    'pageSize' => 30,             // remote: rows per page, sent as detail.limit
+    'debounce' => 250,            // remote: ms of quiet typing before a search is sent
+])
+
+@php
+    $trigger = in_array($trigger, ['button', 'input'], true) ? $trigger : 'button';
+    $isInput = $trigger === 'input';
+    $indicator = in_array($indicator, ['check', 'checkbox', 'radio'], true) ? $indicator : 'check';
+
+    // i18n-safe defaults: these are translation keys, localise them in your lang files.
+    // The input trigger has a single visible placeholder (the search field itself); default it to "Search...".
+    $placeholder ??= $isInput ? __('Search...') : __('Select option...');
+    $searchPlaceholder ??= __('Search...');
+    $empty ??= __('No results found.');
+
+    // Keys beyond value and label stay on the option: they travel with the combobox-select event.
+    $opts = collect($options)->map(fn ($o) => is_array($o)
+        ? ['value' => (string) ($o['value'] ?? ''), 'label' => (string) ($o['label'] ?? $o['value'] ?? '')] + $o
+        : ['value' => (string) $o, 'label' => (string) $o]
+    )->values();
+
+    // Multiple seeds an array of values; single keeps the scalar string.
+    $initialValue = $multiple
+        ? collect(is_array($value) ? $value : (($value === '' || $value === null) ? [] : [$value]))->map(fn ($v) => (string) $v)->values()
+        : (string) $value;
+
+    // Input trigger seeds the query with the selected label (single select) so the field shows it.
+    // Guard the scalar cast: in multiple mode $value is an array.
+    $selectedSingle = $multiple ? null : $opts->firstWhere('value', (string) $value);
+    $initialQuery = ($isInput && ! $multiple) ? (string) ($selectedSingle['label'] ?? '') : '';
+
+    $sizes = [
+        'sm' => 'h-8 py-1 text-sm',
+        'default' => 'h-9 py-2 text-sm',
+        'lg' => 'h-10 py-2 text-base',
+    ];
+    $sizeCls = $sizes[$size] ?? $sizes['default'];
+    $minH = ['sm' => 'min-h-8', 'default' => 'min-h-9', 'lg' => 'min-h-10'][$size] ?? 'min-h-9';
+
+    // The button trigger keeps the search box in step with the active option. A consumer x-init
+    // runs after it: two x-init attributes on one element and the browser keeps only the first,
+    // silently dropping the consumer's (issue #46).
+    $xInit = $attributes->get('x-init');
+    $attributes = $attributes->except('x-init');
+    $init = implode('; ', array_filter([$isInput ? null : "\$watch('query', () => ensureActive())", $xInit]));
+
+    // Livewire bridge — bind the listbox value to a consumer's wire:model when present, through
+    // $blatModel (blatui-core.js): the property path travels as a data attribute so a morph can
+    // re-point it.
+    // No-op (and stripped) without Livewire. blatListbox uses config.value verbatim (no coercion).
+    $wireModel = \Illuminate\View\ComponentAttributeBag::hasMacro('wire') ? $attributes->wire('model') : null;
+    $hasWire = $wireModel && is_string($wireModel->value()) && $wireModel->value() !== '';
+    if ($hasWire) {
+        $attributes = $attributes->whereDoesntStartWith('wire:model')->merge(array_filter([
+            'data-blat-model' => $wireModel->value(),
+            'data-blat-model-live' => $wireModel->hasModifier('live') ? '1' : null,
+        ]));
+    }
+@endphp
+
+<div
+    data-slot="combobox"
+    data-blat-value="{{ json_encode($initialValue) }}"
+    x-data="blatListbox({
+        trigger: @js($trigger),
+        multiple: @js((bool) $multiple),
+        model: $blatModel(),
+        query: @js($initialQuery),
+        options: @js($opts),
+        remote: @js((bool) $remote),
+        pageSize: @js(max(1, (int) $pageSize)),
+        debounce: @js(max(0, (int) $debounce)),
+    })"
+    x-id="['blat-combobox-list', 'blat-combobox-opt']"
+    @if ($init) x-init="{{ $init }}" @endif
+    {{ $attributes->twMerge('relative '.$width) }}
+>
+    @if ($name)
+        @if ($multiple)
+            <template x-for="v in value" :key="v">
+                <input type="hidden" name="{{ $name }}[]" :value="v" />
+            </template>
+        @else
+            <input type="hidden" name="{{ $name }}" :value="value" />
+        @endif
+    @endif
+
+    @if ($isInput)
+        {{-- Inline-input trigger (autocomplete shape): the field itself is the search box. --}}
+        @if ($multiple)
+            {{-- Tag input: bordered box wrapping chips + a growing search field. --}}
+            <div
+                x-ref="control"
+                @click="! $refs.input.contains($event.target) && $refs.input.focus()"
+                class="border-input dark:bg-input/30 {{ $minH }} flex w-full flex-wrap items-center gap-1 rounded-md border bg-transparent px-2 py-1 shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] {{ $disabled ? 'pointer-events-none opacity-50' : '' }}"
+            >
+                @if ($icon)
+                    <x-dynamic-component
+                        :component="'lucide-'.$icon"
+                        class="text-muted-foreground pointer-events-none ms-1 size-4 shrink-0"
+                        aria-hidden="true"
+                    />
+                @endif
+                <template x-for="o in selected" :key="o.value">
+                    <span class="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium">
+                        <span x-text="o.label"></span>
+                        <span
+                            role="button"
+                            tabindex="-1"
+                            :aria-label="@js(__('Remove :label')).replace(':label', o.label)"
+                            @click.stop.prevent="remove(o.value)"
+                            class="hover:text-foreground/70 inline-flex cursor-pointer items-center rounded-sm outline-none"
+                        >
+                            <x-lucide-x class="size-3" aria-hidden="true" />
+                        </span>
+                    </span>
+                </template>
+                <input
+                    x-ref="input"
+                    @if ($id) id="{{ $id }}" @endif
+                    x-model="query"
+                    type="text"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    autocomplete="off"
+                    :aria-expanded="open"
+                    :aria-controls="$id('blat-combobox-list')"
+                    :aria-activedescendant="activeValue != null ? $id('blat-combobox-opt', activeValue) : null"
+                    @focus="openList()"
+                    @click="openList()"
+                    @input="onInput()"
+                    @keydown.down.prevent="move(1)"
+                    @keydown.up.prevent="move(-1)"
+                    @keydown.enter.prevent="selectActive()"
+                    @keydown.escape.prevent.stop="close()"
+                    @keydown.backspace="backspace()"
+                    placeholder="{{ $placeholder }}"
+                    @disabled($disabled)
+                    class="placeholder:text-muted-foreground min-w-[6rem] flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
+                />
+                <x-lucide-chevron-down
+                    class="text-muted-foreground pointer-events-none ms-auto size-4 shrink-0 self-center opacity-50 transition-transform"
+                    x-bind:class="open && 'rotate-180'"
+                    aria-hidden="true"
+                />
+            </div>
+        @elseif (isset($start) || isset($end))
+            {{-- Field with addons: the start and end slots sit inside the border, like an
+             input-group (a search icon, icon-only buttons). Clicking them never opens the list. --}}
+            <div
+                x-ref="control"
+                @click="$event.target === $el && $refs.input.focus()"
+                class="border-input dark:bg-input/30 {{ $minH }} flex w-full items-center gap-1 rounded-md border bg-transparent px-1 shadow-xs transition-[color,box-shadow] has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-ring/50 has-[input:focus-visible]:ring-[3px] [&_svg:not([class*='size-'])]:size-4 {{ $disabled ? 'pointer-events-none opacity-50' : '' }}"
+            >
+                @isset($start)
+                    <div data-slot="combobox-start" class="text-muted-foreground flex shrink-0 items-center gap-1 ps-2">
+                        {{ $start }}
+                    </div>
+                @endisset
+                <input
+                    x-ref="input"
+                    @if ($id) id="{{ $id }}" @endif
+                    x-model="query"
+                    type="text"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    autocomplete="off"
+                    :aria-expanded="open"
+                    :aria-controls="$id('blat-combobox-list')"
+                    :aria-activedescendant="activeValue != null ? $id('blat-combobox-opt', activeValue) : null"
+                    @focus="openList()"
+                    @click="openList()"
+                    @input="onInput()"
+                    @keydown.down.prevent="move(1)"
+                    @keydown.up.prevent="move(-1)"
+                    @keydown.enter.prevent="selectActive()"
+                    @keydown.escape.prevent.stop="close()"
+                    placeholder="{{ $placeholder }}"
+                    @disabled($disabled)
+                    class="placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent px-2 text-sm outline-none disabled:cursor-not-allowed {{ $sizeCls }}"
+                />
+                @isset($end)
+                    <div data-slot="combobox-end" class="text-muted-foreground flex shrink-0 items-center gap-1 pe-1">
+                        {{ $end }}
+                    </div>
+                @endisset
+            </div>
+        @else
+            <div class="relative">
+                @if ($icon)
+                    <x-dynamic-component
+                        :component="'lucide-'.$icon"
+                        class="text-muted-foreground pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2"
+                        aria-hidden="true"
+                    />
+                @endif
+                <input
+                    x-ref="control"
+                    @if ($id) id="{{ $id }}" @endif
+                    x-model="query"
+                    type="text"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    autocomplete="off"
+                    :aria-expanded="open"
+                    :aria-controls="$id('blat-combobox-list')"
+                    :aria-activedescendant="activeValue != null ? $id('blat-combobox-opt', activeValue) : null"
+                    @focus="openList()"
+                    @click="openList()"
+                    @input="onInput()"
+                    @keydown.down.prevent="move(1)"
+                    @keydown.up.prevent="move(-1)"
+                    @keydown.enter.prevent="selectActive()"
+                    @keydown.escape.prevent.stop="close()"
+                    placeholder="{{ $placeholder }}"
+                    @disabled($disabled)
+                    class="border-input dark:bg-input/30 placeholder:text-muted-foreground flex w-full rounded-md border bg-transparent pe-9 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 {{ $icon ? 'ps-9' : 'ps-3' }} {{ $sizeCls }}"
+                />
+                <x-lucide-chevron-down
+                    class="text-muted-foreground pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 opacity-50 transition-transform"
+                    x-bind:class="open && 'rotate-180'"
+                    aria-hidden="true"
+                />
+            </div>
+        @endif
+    @else
+        <button
+            type="button"
+            x-ref="trigger"
+            @if ($id) id="{{ $id }}" @endif
+            @click="toggle()"
+            @keydown.down.prevent.stop="openList()"
+            @keydown.up.prevent.stop="openList()"
+            @keydown.enter.prevent.stop="openList()"
+            @keydown.space.prevent.stop="openList()"
+            role="combobox"
+            aria-haspopup="listbox"
+            @unless ($id) aria-label="{{ $placeholder }}" @endunless
+            :aria-expanded="open"
+            :aria-controls="$id('blat-combobox-list')"
+            @disabled($disabled)
+            class="{{ $width }} border-input dark:bg-input/30 dark:hover:bg-input/50 inline-flex min-h-9 items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-1.5 text-sm font-normal whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none hover:bg-transparent focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+            {{-- single-select label --}}
+            <span
+                x-show="! multiple"
+                x-text="label || @js($placeholder)"
+                :class="{ 'text-muted-foreground': ! label }"
+            ></span>
+
+            {{-- multi-select: placeholder when empty, else removable chips --}}
+            <span x-show="multiple && ! selected.length" class="text-muted-foreground">{{ $placeholder }}</span>
+            <span x-show="multiple && selected.length" class="flex flex-1 flex-wrap items-center gap-1">
+                <template x-for="o in selected" :key="o.value">
+                    <span class="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium">
+                        <span x-text="o.label"></span>
+                        <span
+                            role="button"
+                            tabindex="-1"
+                            :aria-label="@js(__('Remove :label')).replace(':label', o.label)"
+                            @click.stop.prevent="remove(o.value)"
+                            class="hover:text-foreground/70 inline-flex cursor-pointer items-center rounded-sm outline-none"
+                        >
+                            <x-lucide-x class="size-3" aria-hidden="true" />
+                        </span>
+                    </span>
+                </template>
+            </span>
+
+            <x-lucide-chevrons-up-down class="size-4 shrink-0 self-center opacity-50" aria-hidden="true" />
+        </button>
+    @endif
+
+    {{-- Teleported to <body> so the listbox is never clipped by an overflow-hidden ancestor. --}}
+    <template x-teleport="body" wire:ignore>
+        <div
+            x-blat-dialog-layer
+            x-show="open"
+            x-cloak
+            data-slot="combobox-content"
+            @unless ($isInput) x-trap.noreturn="open && $blatInModal" @endunless
+            {{-- x-blat-anchor, not Alpine's x-anchor: same house directive as select-content and
+             dropdown-menu-content, so a panel opened from inside a modal's top layer positions
+             the same way everywhere, and a long list opened from a low trigger gets capped to the
+             viewport instead of running off it. `.match-width` keeps the panel at least as wide as
+             the trigger and — unlike the offsetWidth read it replaces — re-measures whenever the
+             trigger resizes, including the 0px→full jump when a dialog opens (issue #18). --}}
+            @if ($isInput)
+                x-blat-anchor.bottom-start.offset.4.match-width="$refs.control"
+                @click.outside="open && ! $refs.control.contains($event.target) && close()"
+            @else
+                x-blat-anchor.bottom-start.offset.4.match-width="$refs.trigger"
+                @click.outside="close(false)"
+                @keydown.escape.prevent.stop="close()"
+            @endif
+            {{-- Column flex + overflow-hidden: when the anchor caps the panel's height, the list below
+             (min-h-0, overflow-y-auto) is what shrinks and scrolls — the search box stays put. --}}
+            class="bg-popover text-popover-foreground z-50 flex w-fit flex-col origin-top overflow-hidden rounded-md border {{ $isInput ? 'p-1' : 'p-0' }} shadow-md"
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+        >
+            <div class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-md">
+                @if (! $isInput && $searchable)
+                    <div class="flex h-9 shrink-0 items-center gap-2 border-b px-3">
+                        <x-lucide-search class="size-4 shrink-0 opacity-50" aria-hidden="true" />
+                        <input
+                            x-ref="search"
+                            @if ($id) id="{{ $id }}-search" @endif
+                            x-model="query"
+                            type="text"
+                            role="combobox"
+                            aria-expanded="true"
+                            aria-autocomplete="list"
+                            autocomplete="off"
+                            aria-label="{{ $searchPlaceholder }}"
+                            :aria-controls="$id('blat-combobox-list')"
+                            :aria-activedescendant="activeValue != null ? $id('blat-combobox-opt', activeValue) : null"
+                            @keydown.down.prevent="move(1)"
+                            @keydown.up.prevent="move(-1)"
+                            @input="queueFetch()"
+                            @keydown.home.prevent="edge('first')"
+                            @keydown.end.prevent="edge('last')"
+                            @keydown.enter.prevent="selectActive()"
+                            placeholder="{{ $searchPlaceholder }}"
+                            class="placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden"
+                        />
+                    </div>
+                @endif
+                <div
+                    role="listbox"
+                    x-ref="list"
+                    tabindex="-1"
+                    :aria-multiselectable="multiple"
+                    :id="$id('blat-combobox-list')"
+                    @if ($remote) @scroll.passive="fillList()" @endif
+                    @if (! $isInput && ! $searchable)
+                        @keydown.down.prevent="move(1)"
+                        @keydown.up.prevent="move(-1)"
+                        @keydown.home.prevent="edge('first')"
+                        @keydown.end.prevent="edge('last')"
+                        @keydown.enter.prevent="selectActive()"
+                    @endif
+                    class="max-h-[300px] min-h-0 scroll-py-1 overflow-x-hidden overflow-y-auto {{ $isInput ? '' : 'p-1' }} outline-hidden"
+                >
+                    <div x-show="visibleCount === 0 && ! loading" class="py-6 text-center text-sm">{{ $empty }}</div>
+                    <template x-for="option in options" :key="option.value">
+                        <div
+                            role="option"
+                            :id="$id('blat-combobox-opt', option.value)"
+                            x-show="isVisible(option)"
+                            @click="select(option.value)"
+                            @mouseenter="activeValue = option.value"
+                            :aria-selected="isSelected(option.value)"
+                            :data-active="activeValue === option.value"
+                            class="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none"
+                        >
+                            @switch ($indicator)
+                                @case ('checkbox')
+                                    <span
+                                        class="border-input flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
+                                        :class="isSelected(option.value) &&
+                                        'bg-primary border-primary text-primary-foreground'"
+                                    >
+                                        <x-lucide-check
+                                            class="size-3"
+                                            x-bind:class="isSelected(option.value) ? 'opacity-100' : 'opacity-0'"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+                                    @break
+                                @case ('radio')
+                                    <span
+                                        class="border-input flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors"
+                                        :class="isSelected(option.value) && 'border-primary'"
+                                    >
+                                        <span
+                                            class="bg-primary size-2 rounded-full transition-opacity"
+                                            :class="isSelected(option.value) ? 'opacity-100' : 'opacity-0'"
+                                        ></span>
+                                    </span>
+                                    @break
+                                @default
+                                    <x-lucide-check
+                                        class="size-4"
+                                        x-bind:class="isSelected(option.value) ? 'opacity-100' : 'opacity-0'"
+                                        aria-hidden="true"
+                                    />
+                            @endswitch
+                            <span x-text="option.label"></span>
+                        </div>
+                    </template>
+                    @if ($remote)
+                        <div
+                            role="status"
+                            x-show="loading"
+                            x-cloak
+                            class="text-muted-foreground flex items-center justify-center gap-2 py-3 text-sm"
+                        >
+                            <x-ui.spinner class="size-4" aria-hidden="true" />
+                            <span>{{ __('Loading…') }}</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
