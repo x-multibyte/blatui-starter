@@ -4,6 +4,8 @@
     'avatar' => '',
     'fallback' => 'CN',
     'align' => 'end',
+    'accountUrl' => null,
+    'logoutUrl' => null,
 ])
 
 <x-ui.sidebar-menu>
@@ -50,20 +52,9 @@
                 </x-ui.dropdown-menu-label>
                 <x-ui.dropdown-menu-separator />
                 <x-ui.dropdown-menu-group>
-                    <x-ui.dropdown-menu-item>
-                        <x-lucide-sparkles />
-                        Upgrade to Pro
-                    </x-ui.dropdown-menu-item>
-                </x-ui.dropdown-menu-group>
-                <x-ui.dropdown-menu-separator />
-                <x-ui.dropdown-menu-group>
-                    <x-ui.dropdown-menu-item>
+                    <x-ui.dropdown-menu-item :href="$accountUrl">
                         <x-lucide-badge-check />
                         Account
-                    </x-ui.dropdown-menu-item>
-                    <x-ui.dropdown-menu-item>
-                        <x-lucide-credit-card />
-                        Billing
                     </x-ui.dropdown-menu-item>
                     <x-ui.dropdown-menu-item>
                         <x-lucide-bell />
@@ -71,10 +62,21 @@
                     </x-ui.dropdown-menu-item>
                 </x-ui.dropdown-menu-group>
                 <x-ui.dropdown-menu-separator />
-                <x-ui.dropdown-menu-item>
-                    <x-lucide-log-out />
-                    Log out
-                </x-ui.dropdown-menu-item>
+                @if ($logoutUrl)
+                    {{-- The menu content is teleported to <body>, so the form lives inside it. --}}
+                    <form method="POST" action="{{ $logoutUrl }}">
+                        @csrf
+                        <x-ui.dropdown-menu-item type="submit" class="w-full">
+                            <x-lucide-log-out />
+                            Log out
+                        </x-ui.dropdown-menu-item>
+                    </form>
+                @else
+                    <x-ui.dropdown-menu-item>
+                        <x-lucide-log-out />
+                        Log out
+                    </x-ui.dropdown-menu-item>
+                @endif
             </x-ui.dropdown-menu-content>
         </x-ui.dropdown-menu>
     </x-ui.sidebar-menu-item>

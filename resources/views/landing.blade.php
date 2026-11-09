@@ -1,4 +1,4 @@
-<x-layouts.app title="Marketing 01">
+<x-layouts.app title="Home">
     <div class="flex min-h-svh flex-col">
         {{-- Nav --}}
         <header class="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 border-b backdrop-blur-xl">
@@ -15,8 +15,14 @@
                     <a href="#cta" class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors">Pricing</a>
                 </nav>
                 <div class="ml-auto flex items-center gap-2">
-                    <x-ui.button variant="ghost" size="sm" href="#">Sign in</x-ui.button>
-                    <x-ui.button size="sm" href="#cta">Get started</x-ui.button>
+                    @auth
+                        <x-ui.button size="sm" :href="route('dashboard')">Dashboard</x-ui.button>
+                    @else
+                        <x-ui.button variant="ghost" size="sm" :href="route('login')">Sign in</x-ui.button>
+                        @if (Route::has('register'))
+                            <x-ui.button size="sm" :href="route('register')">Get started</x-ui.button>
+                        @endif
+                    @endauth
                 </div>
             </div>
         </header>
@@ -137,7 +143,7 @@
                         <h2 class="text-3xl font-bold tracking-tight text-balance sm:text-4xl">Ready to build something great?</h2>
                         <p class="text-primary-foreground/80 mx-auto mt-4 max-w-xl text-lg">Start free today. Upgrade when you're ready — no lock-in, ever.</p>
                         <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-                            <x-ui.button size="lg" variant="secondary" href="#">Get started free</x-ui.button>
+                            <x-ui.button size="lg" variant="secondary" :href="auth()->check() ? route('dashboard') : route('register')">Get started free</x-ui.button>
                             <x-ui.button size="lg" variant="outline" href="#" class="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
                                 Talk to sales
                             </x-ui.button>
