@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Blaze\Blaze;
+use TailwindMerge\Contracts\TailwindMergeContract;
+use TailwindMerge\TailwindMerge;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +15,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(TailwindMergeContract::class, fn () => TailwindMerge::factory()
+            ->withConfiguration(config('tailwind-merge', []))
+            ->withCache(Cache::memo())
+            ->make());
     }
 
     /**
@@ -19,6 +26,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Blaze::optimize()->in(resource_path('views/components/ui'));
     }
 }

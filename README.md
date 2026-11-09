@@ -37,7 +37,11 @@ Open <http://localhost:8000> — the landing page. `/login`, `/register`, `/dash
 
 ## What's inside
 
-- **Laravel 13** · **Tailwind CSS v4** · **Alpine.js 3** · **Vite 8** · **Pest 5**.
+- **Laravel 13** · **Livewire 4** · **Tailwind CSS v4** · **Alpine.js 3** · **Vite 8** · **Pest 5**.
+- **Livewire-ready & Blaze-optimized out of the box** (`livewire/livewire` v4 + `livewire/blaze` v1 installed and pre-configured):
+  - Every BlatUI value-bearing component (`input`, `select`, `combobox`, `checkbox`, `switch`, `slider`, `date-picker`, `file-upload`, `data-table`, `server-table`, etc.) supports two-way `wire:model` binding via BlatUI's built-in Livewire bridge.
+  - Full-page Livewire components default to the `layouts::app` layout (`resources/views/components/layouts/app.blade.php`).
+  - `Blaze::optimize()->in(resource_path('views/components/ui'))` and `Cache::memo()` for `tailwind-merge` are pre-wired in `AppServiceProvider` for maximum rendering performance.
 - **Full authentication & account management** built entirely with BlatUI components:
   - Login, registration, password reset, email verification, and password confirmation (`resources/views/auth/*`).
   - Profile information update, password update, and account deletion confirmation dialog (`resources/views/profile/*`).
