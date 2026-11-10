@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.0.5] - 2026-11-10
+
 ### Added
 - **Configurable SaaS Home Page (`resources/views/pages/home.blade.php`):** Added the official BlatUI SaaS landing page (`https://blatui.remix-it.com/templates/saas`) under `resources/views/pages/home.blade.php`, mapped via `config('blatui.pages.home')` (`BLATUI_HOME_VIEW`) and wired to `route('home')` (`/`).
 - **Reusable Frontend Header & Footer Layout Components (`<x-layouts.header>` & `<x-layouts.footer>`):** Extracted `resources/views/components/layouts/header.blade.php` and `resources/views/components/layouts/footer.blade.php` driven by `config('blatui.navigation')` and `config('blatui.footer')`, with built-in dark/light mode toggle (`$store.theme.toggle()`) and `@auth` user avatar dropdown / `@guest` sign-in & registration controls.
+
+### Fixed
+- **Theme Toggle Reactivity Fix:** Added `x-data` attribute to the root layout `<body>` (`resources/views/components/layouts/app.blade.php`) and hardened Alpine/BlatUI store lifecycle registration in `resources/js/app.js`, ensuring the dark/light mode toggle operates reliably across Blade and Livewire contexts.
 
 ## [0.0.4] - 2026-11-10
 
