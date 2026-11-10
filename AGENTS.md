@@ -270,4 +270,66 @@ vendor/bin/pest --agent='visit("/")->on()->mobile()->screenshot(fullPage: false,
 
 For full usage — backend examples, browser testing, screenshots, responsive checks, combining frontend and backend assertions, RefreshDatabase guidance, and pitfalls — load the **`pest-plugin-agent` skill**.
 
+=== project workflow & boundaries ===
+
+# Project Workflow & Architecture Boundaries
+
+## Agent Skills Lifecycle (`using-agent-skills`)
+
+Follow the structured `using-agent-skills` engineering sequence across sessions:
+1. **Define (`interview-me` → `spec-driven-development`)**: Clarify intent, surface assumptions, and lock scope & boundaries in [`SPEC.md`](SPEC.md) before writing code.
+2. **Plan (`planning-and-task-breakdown`)**: Decompose work into small, verifiable slices in [`tasks/plan.md`](tasks/plan.md) and [`tasks/todo.md`](tasks/todo.md).
+3. **Build (`source-driven-development` + `blatui-development` + `laravel-best-practices`)**: Fetch official BlatUI components/blocks and cite sources; never invent custom UI layouts from scratch when BlatUI provides them.
+4. **Verify (`testing-best-practices` + `pest-plugin-agent`)**: Verify with Pest datasets, `vendor/bin/pest --agent='...'`, `vendor/bin/pint --dirty --format agent`, and `npm run build`.
+5. **Review & Ship (`code-review-and-quality` + `git-workflow-and-versioning` + `documentation-and-adrs`)**: Perform five-axis review, record architectural decisions in [`docs/decisions/`](docs/decisions/), update [`CHANGELOG.md`](CHANGELOG.md), and commit in clean atomic Conventional Commits (`ADR-004`).
+
+## Spec & ADR First (`SPEC.md` & `docs/decisions/`)
+
+- Before initiating architectural, structural, or scope modifications, always inspect [`SPEC.md`](SPEC.md), existing Architecture Decision Records in [`docs/decisions/`](docs/decisions/) (`ADR-001`, `ADR-002`, `ADR-003`), [`tasks/plan.md`](tasks/plan.md), and [`tasks/todo.md`](tasks/todo.md).
+- When introducing a non-trivial architectural decision, interface pattern, or boundary constraint, record an Architecture Decision Record in `docs/decisions/` following sequential numbering (`docs/decisions/ADR-00X-<kebab-case-title>.md`). Follow the established format: Status, Date, Context, Decision, Alternatives Considered, Consequences.
+- Maintain alignment between `SPEC.md`, ADRs, and implementation tasks; never make uncoordinated or undocumented scope expansions.
+
+## Source-Driven BlatUI MCP Discovery
+
+- **Never create custom UI components or page layouts from scratch** when BlatUI already supplies an official implementation.
+- Autonomously query the BlatUI registry and MCP server before building:
+  - Run `php artisan blatui:list` to browse locally available and downloadable components.
+  - Run `php artisan blatui:mcp` or query the local MCP server (tools: `search_registry`, `get_component`, `get_example`, `install_command`; resources: `blatui://component|block|chart/{name}`).
+  - Query in PHP using `app(\BlatUI\Mcp\RegistryClient::class)->itemsOfType('registry:block')`, `->component($name)`, or `->example('block', $name)`.
+  - Directly inspect the upstream remote registry at `https://blatui.remix-it.com/r/blocks/<name>.json`, `https://blatui.remix-it.com/r/<name>.json`, or `https://blatui.remix-it.com/llms.txt`.
+- Inspect official `<x-ui.*>` primitives, `<x-block.*>` layout building blocks, and full-page blocks:
+  - Auth blocks: `login-01` through `login-05`, `signup-01` through `signup-05`
+  - Dashboard blocks: `dashboard-01` through `dashboard-04`
+  - Commercial & marketing blocks: `marketing-01`, `pricing-01`
+  - Layout & navigation blocks: `sidebar-01` through `sidebar-16`
+  - Specialized blocks: `calendar-01` through `calendar-32`
+- When porting an upstream block into the application, cite the upstream source URL in a comment header at the top of the file (e.g., `{{-- Source: https://blatui.remix-it.com/r/blocks/login-01.json --}}`).
+
+## Page Directory Convention (`resources/views/pages/`)
+
+- Place all page-level Blade views and multi-variant page templates in `resources/views/pages/` (e.g., `resources/views/pages/auth/login-01.blade.php`..`05`, `signup-01.blade.php`..`05`).
+- Ensure every page template is **100% functionally wired** to Laravel backend conventions:
+  - Valid `method="POST"` actions pointing to named routes (`action="{{ route('login') }}"`, `action="{{ route('register') }}"`).
+  - `@csrf` token directive present on every form.
+  - Real input names and `:value="old('field')"` bindings.
+  - Validation error feedback rendered using `<x-ui.field-error :messages="$errors->get('field')" />`.
+  - Status messages rendered with session status alerts (`session('status')`).
+  - Real named route links (`route('password.request')`, `route('login')`, `route('register')`, `route('home')`).
+  - **Never leave static `#` demo links, dummy inputs without `name` attributes, or unhandled form submissions.**
+
+## Locked Dependencies & Manual Upstream Review (`ADR-001`)
+
+- The starter kit pre-bundles 180+ `<x-ui.*>` components and all necessary peer NPM/Composer dependencies locked in `composer.lock` and `package-lock.json` for zero-friction project setup.
+- Never add automated scripts, scheduled bots, or auto-merge jobs that overwrite `resources/views/components/ui/` or upgrade locked dependencies without explicit human review.
+- Upstream changes to `anousss007/blatui` or framework dependencies must be reviewed manually to avoid regressions.
+
+## Subagent Orchestration & Quality Gates (`ADR-002`)
+
+- For multi-file features or variant batches, delegate parallelizable slices to Gemini Flash 3.8 (`Model: "flash"`) subagents.
+- Maintain strict file isolation across subagents to prevent concurrent write collisions.
+- Verify every implementation slice against the three mandatory quality gates:
+  1. Code formatting: `vendor/bin/pint --dirty --format agent` (or `composer run lint`)
+  2. Asset build: `npm run build`
+  3. Tests: `php artisan test --compact` (or `composer run test`)
+
 </laravel-boost-guidelines>
