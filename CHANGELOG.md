@@ -4,7 +4,9 @@ All notable changes to `x-multibyte/blatui-starter` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — v0.0.3
+## [Unreleased]
+
+## [0.0.3] - 2026-11-10
 
 ### Added
 - **Multi-Variant Functional Auth Pages (`resources/views/pages/auth/`):** Added all 5 official BlatUI login blocks (`login-01` through `login-05`) and all 5 official signup blocks (`signup-01` through `signup-05`), fully wired to Laravel authentication routes (`POST /login`, `POST /register`), `@csrf`, `old()` state retention, `<x-ui.field-error>` validation feedback, session status alerts, and named route links (`ADR-003`).
