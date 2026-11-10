@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Demo Data Seeding Workflow:** README documents `php artisan db:seed` for a local demo account (`test@example.com` / `password`, email pre-verified) and `php artisan migrate:fresh --seed` for a clean reset, so the dashboard and authentication flows can be exercised manually. Automated tests remain isolated on an in-memory SQLite database with model factories.
+- **Browser Verification Documentation:** README and `SPEC.md` document the Playwright prerequisite (`npx playwright install`), one-shot Pest browser checks (`vendor/bin/pest --agent='...'`), screenshot output under the gitignored `tests/Browser/Screenshots/`, and the automatic Vite stub fallback for fresh clones without a frontend build.
+
 ### Fixed
 - **Deterministic Test Environment:** `phpunit.xml` now forces `APP_ENV=testing` through both `<env>` and `<server>` entries, so an ambient `APP_ENV` from the host shell (for example `APP_ENV=local`) can no longer disable Laravel's testing mode. Previously this activated CSRF middleware and made every CSRF-protected POST test fail with HTTP 419.
 - **Styled Browser-Test Screenshots:** `tests/TestCase.php` now stubs Vite only when `public/build/manifest.json` is missing. Browser tests and `visit()->screenshot()` captures load the compiled CSS/JS whenever frontend assets are built, while fresh clones can still run the suite without a build.

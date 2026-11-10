@@ -58,6 +58,21 @@ This starts the Laravel HTTP server, queue worker, Laravel Pail log stream, and 
 
 Open **<http://localhost:8000>** to explore the landing page, analytics dashboard, profile management, and authentication flows.
 
+### 3. Seed Demo Data (Optional)
+
+Automated tests create their own data with factories, but the local development database can be seeded with a ready-to-use demo account:
+
+```bash
+php artisan db:seed
+# → test@example.com / password (email pre-verified)
+```
+
+Since `test@example.com` is unique, reset the database and reseed from scratch when you need a clean slate:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
 ---
 
 ## What's Inside
@@ -155,6 +170,39 @@ To switch authentication layout styles, update `config/blatui.php` (or set the c
 
 ---
 
+## Testing & Browser Verification
+
+### PHP Test Suite
+
+```bash
+composer run test            # clears config, checks Pint, runs the Pest suite (mirrors CI)
+php artisan test --compact   # Pest suite only
+```
+
+`phpunit.xml` pins `APP_ENV=testing` with `force="true"` on both `<env>` and `<server>`, so an ambient `APP_ENV` can never switch the suite back to the local environment and re-enable CSRF middleware. Feature tests use `RefreshDatabase` on an in-memory SQLite database with model factories — seeded development data is never touched.
+
+### Browser Tests & Screenshots
+
+Pest is pre-wired with [`pestphp/pest-plugin-browser`](https://pestphp.com/docs/browser-testing). Install the browser binaries once (Chromium, Firefox, WebKit, FFmpeg):
+
+```bash
+npx playwright install
+```
+
+One-shot browser checks run against the plugin's own HTTP server, so `composer run dev` does not need to be running:
+
+```bash
+vendor/bin/pest --agent='visit("/login")->assertSee("Login to your account");'
+
+vendor/bin/pest --agent='$user = \App\Models\User::factory()->create(); visit("/login")->type("email", $user->email)->type("password", "password")->press("Login")->assertPathIs("/dashboard");'
+
+vendor/bin/pest --agent='visit("/")->on()->mobile()->screenshot(fullPage: false, filename: "home-mobile");'
+```
+
+Screenshots are written to `tests/Browser/Screenshots/` (gitignored). Run `npm run build` first for styled screenshots: the base `TestCase` stubs Vite only when `public/build/manifest.json` is missing, so fresh clones still run the suite without a build. Load the `pest-plugin-agent` skill for the full browser API reference.
+
+---
+
 ## Commands
 
 | Command | Description |
@@ -166,6 +214,10 @@ To switch authentication layout styles, update `config/blatui.php` (or set the c
 | `composer run lint:check` | Check PHP formatting without modifying files (`pint --parallel --test` — used in CI) |
 | `composer run test` | Clear config cache, verify Pint formatting, and run the Pest 5 test suite |
 | `php artisan test --compact` | Run Pest feature and unit tests with concise output |
+| `php artisan db:seed` | Seed the local development database with the demo `test@example.com` account |
+| `php artisan migrate:fresh --seed` | Reset the local database and re-run all seeders |
+| `npx playwright install` | Install Playwright browser binaries for Pest browser tests (one-time) |
+| `vendor/bin/pest --agent='<code>'` | Run a one-shot Pest assertion, including `visit()` browser checks |
 | `php artisan blatui:list` | Browse all official BlatUI components, blocks, and charts |
 | `php artisan blatui:add <name>` | Copy a BlatUI component or block into your application |
 | `php artisan blatui:mcp` | Start local BlatUI MCP server for autonomous AI agent inspection |
@@ -182,6 +234,7 @@ Architectural decisions, quality standards, and technical specifications are com
   - **[`ADR-001: Pre-bundle All BlatUI Components with Locked Dependencies and Manual Upstream Review`](docs/decisions/ADR-001-prebundle-and-lock-blatui-components.md)**: Why all 180+ components and peer packages are bundled upfront and locked against automated drift.
   - **[`ADR-002: Standard Laravel GitHub Actions CI with Pint and Pest`](docs/decisions/ADR-002-ci-cd-and-quality-gates.md)**: Establishing continuous integration quality gates enforcing Pint formatting, Vite build, and Pest test suite.
   - **[`ADR-003: Multi-Variant Functional Auth Pages from BlatUI Registry Blocks`](docs/decisions/ADR-003-multi-variant-auth-pages-via-blatui-blocks.md)**: Pre-wiring official BlatUI `login-01`..`05` and `signup-01`..`05` blocks under `resources/views/pages/auth/`.
+  - **[`ADR-004: Git Workflow, Semantic Versioning Tags, and Curated Changelog`](docs/decisions/ADR-004-git-workflow-versioning-and-changelog.md)**: Atomic Conventional Commits, short-lived branches, SemVer tags, and a curated `CHANGELOG.md`.
 
 ### Continuous Integration (CI/CD)
 

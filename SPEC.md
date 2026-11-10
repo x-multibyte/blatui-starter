@@ -67,6 +67,13 @@ composer run test
 
 # Run targeted Pest tests
 php artisan test --compact tests/Feature/Auth/AuthenticationTest.php
+
+# Seed the local development database with the demo account
+php artisan db:seed
+php artisan migrate:fresh --seed
+
+# Install Playwright browser binaries (one-time, for browser tests)
+npx playwright install
 ```
 
 ---
@@ -188,7 +195,8 @@ Following `laravel-best-practices` and `testing-best-practices`:
 - **Scope Rule:**
   - **Test core flows & dependencies:** Authentication (`tests/Feature/Auth/*`), Profile management (`tests/Feature/ProfileTest.php`), Landing & Dashboard route rendering, and Livewire/Blaze boot integrity.
   - **Do NOT exhaustively test every BlatUI component:** The 180+ `<x-ui.*>` components are pre-bundled upstream primitives; we verify their shared runtime dependencies (`tailwind-merge`, `livewire/blaze`, Vite build, Alpine boot) rather than maintaining 180+ isolated component unit tests.
-- **One-Shot & Browser Verification:** Use `vendor/bin/pest --agent='...'` for rapid verification and visual/browser checks when modifying Auth or layout views.
+- **One-Shot & Browser Verification:** Use `vendor/bin/pest --agent='...'` for rapid verification and visual/browser checks when modifying Auth or layout views. Install the Playwright browser binaries once with `npx playwright install`; screenshots land in the gitignored `tests/Browser/Screenshots/`.
+- **Environment Determinism & Asset Fidelity:** `phpunit.xml` forces `APP_ENV=testing` on both `<env>` and `<server>` so host-level `APP_ENV` exports cannot re-enable CSRF middleware; `tests/TestCase.php` stubs Vite only when `public/build/manifest.json` is absent, so browser screenshots use compiled CSS/JS when built while fresh clones still render without a build.
 - **Source-Driven & Subagent Orchestration:**
   - Follow `source-driven-development`: fetch official BlatUI block sources (`https://blatui.remix-it.com/r/blocks/<name>.json`) rather than inventing custom components, and cite source URLs in Blade/PHP comments.
   - Delegate implementation tasks in batches to Gemini Flash 3.8 (`Model: "flash"`) subagents while the lead agent orchestrates and runs verification gates (`composer run test`, `vendor/bin/pint --dirty --format agent`, `npm run build`) after each batch.
