@@ -16,6 +16,6 @@ class EmailVerificationPromptController extends Controller
     {
         return $request->user()->hasVerifiedEmail()
                     ? redirect()->intended(route('dashboard', absolute: false))
-                    : view('pages.auth.verify-email');
+                    : view(config('blatui.pages.auth.verify_email', 'pages.auth.verify-email'));
     }
 }

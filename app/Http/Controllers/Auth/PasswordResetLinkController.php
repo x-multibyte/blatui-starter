@@ -16,7 +16,7 @@ class PasswordResetLinkController extends Controller
      */
     public function create(): View
     {
-        return view('pages.auth.forgot-password');
+        return view(config('blatui.pages.auth.forgot_password', 'pages.auth.forgot-password'));
     }
 
     /**

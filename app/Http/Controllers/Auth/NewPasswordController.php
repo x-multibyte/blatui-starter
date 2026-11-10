@@ -21,7 +21,7 @@ class NewPasswordController extends Controller
      */
     public function create(Request $request): View
     {
-        return view('pages.auth.reset-password', ['request' => $request]);
+        return view(config('blatui.pages.auth.reset_password', 'pages.auth.reset-password'), ['request' => $request]);
     }
 
     /**

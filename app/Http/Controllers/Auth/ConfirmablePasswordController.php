@@ -16,7 +16,7 @@ class ConfirmablePasswordController extends Controller
      */
     public function show(): View
     {
-        return view('pages.auth.confirm-password');
+        return view(config('blatui.pages.auth.confirm_password', 'pages.auth.confirm-password'));
     }
 
     /**

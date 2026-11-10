@@ -19,13 +19,17 @@ test('new users can register', function () {
 });
 
 test('signup variants render without errors and expose required registration fields', function (string $variant) {
-    $view = $this->withViewErrors([])->view("pages.auth.{$variant}");
+    config(['blatui.pages.auth.register' => "pages.auth.{$variant}"]);
 
-    $view->assertSee('action="'.route('register').'"', false);
-    $view->assertSee('name="name"', false);
-    $view->assertSee('name="email"', false);
-    $view->assertSee('name="password"', false);
-    $view->assertSee('name="password_confirmation"', false);
+    $response = $this->get('/register');
+
+    $response->assertOk();
+    $response->assertViewIs("pages.auth.{$variant}");
+    $response->assertSee('action="'.route('register').'"', false);
+    $response->assertSee('name="name"', false);
+    $response->assertSee('name="email"', false);
+    $response->assertSee('name="password"', false);
+    $response->assertSee('name="password_confirmation"', false);
 })->with([
     'signup-01',
     'signup-02',

@@ -41,12 +41,16 @@ test('users can logout', function () {
 });
 
 test('all login page variants render with functional authentication form', function (string $variant) {
-    $view = $this->withViewErrors([])->view("pages.auth.{$variant}");
+    config(['blatui.pages.auth.login' => "pages.auth.{$variant}"]);
 
-    $view->assertSee('action="'.route('login').'"', false);
-    $view->assertSee('name="email"', false);
-    $view->assertSee('name="password"', false);
-    $view->assertSee('remember', false);
+    $response = $this->get('/login');
+
+    $response->assertOk();
+    $response->assertViewIs("pages.auth.{$variant}");
+    $response->assertSee('action="'.route('login').'"', false);
+    $response->assertSee('name="email"', false);
+    $response->assertSee('name="password"', false);
+    $response->assertSee('remember', false);
 })->with([
     'login-01',
     'login-02',
