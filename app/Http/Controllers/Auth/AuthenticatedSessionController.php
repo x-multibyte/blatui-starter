@@ -13,10 +13,13 @@ class AuthenticatedSessionController extends Controller
 {
     /**
      * Display the login view.
+     *
+     * To change the active login page layout, switch the returned view to any of
+     * the official BlatUI variants: 'pages.auth.login-01' through 'pages.auth.login-05'.
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('pages.auth.login-01');
     }
 
     /**

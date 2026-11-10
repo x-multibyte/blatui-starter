@@ -39,3 +39,18 @@ test('users can logout', function () {
     $this->assertGuest();
     $response->assertRedirect('/');
 });
+
+test('all login page variants render with functional authentication form', function (string $variant) {
+    $view = $this->withViewErrors([])->view("pages.auth.{$variant}");
+
+    $view->assertSee('action="'.route('login').'"', false);
+    $view->assertSee('name="email"', false);
+    $view->assertSee('name="password"', false);
+    $view->assertSee('remember', false);
+})->with([
+    'login-01',
+    'login-02',
+    'login-03',
+    'login-04',
+    'login-05',
+]);

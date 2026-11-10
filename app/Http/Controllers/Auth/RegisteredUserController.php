@@ -17,10 +17,13 @@ class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
+     *
+     * To change the signup style, swap 'pages.auth.signup-01' with any of
+     * the available BlatUI variants: 'pages.auth.signup-01' through 'pages.auth.signup-05'.
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view('pages.auth.signup-01');
     }
 
     /**
