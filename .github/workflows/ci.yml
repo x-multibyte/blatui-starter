@@ -1,0 +1,88 @@
+# GitHub Actions CI Workflow for BlatUI Starter (x-multibyte/blatui-starter)
+#
+# References:
+# - ADR-002: docs/decisions/ADR-002-ci-cd-and-quality-gates.md
+# - Official Laravel CI Conventions: https://laravel.com/docs/master/testing
+# - Official GitHub Actions: shivammathur/setup-php@v2, actions/setup-node@v4, actions/cache@v4
+#
+# Enforces three mandatory quality gates on push and pull_request to main/master:
+# 1. Code Style Gate: composer run lint:check (Laravel Pint)
+# 2. Frontend Build Gate: npm ci && npm run build (Vite asset compilation)
+# 3. Test Suite Gate: php artisan test --compact (Pest 5 test suite with SQLite)
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests & Quality Gates (PHP 8.4, Node 22)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, json, libxml, fileinfo, openssl
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: Prepare environment file
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Generate application key
+        run: php artisan key:generate --ansi
+
+      - name: Prepare SQLite database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run database migrations
+        run: php artisan migrate --force --ansi
+
+      - name: "Quality Gate 1: Code Style (Laravel Pint)"
+        run: composer run lint:check
+
+      - name: "Quality Gate 2: Frontend Asset Build (Vite)"
+        run: npm ci && npm run build
+
+      - name: "Quality Gate 3: Test Suite (Pest 5)"
+        run: php artisan test --compact
