@@ -8,9 +8,10 @@ This initiative spans three independently verifiable modules:
 |---|---|---|
 | `foundation-docs` | Project-level `SPEC.md`, ADR repository (`docs/decisions/`), `AGENTS.md` workflow alignment, and `README.md` overhaul | — |
 | `ci-cd` | Standard Laravel GitHub Actions workflows enforcing Laravel Pint formatting, Vite asset compilation, and Pest 5 test suite | `foundation-docs` |
-| `auth-ui` | Integrating official BlatUI auth blocks (`login-01`..`login-05`, `signup-01`..`signup-05`) under `resources/views/pages/` so project creators can pick their preferred variant out of the box | `foundation-docs` |
+| `auth-ui` | Integrating official BlatUI auth blocks (`login-01`..`login-05`, `signup-01`..`signup-05`) under `resources/views/pages/auth/` mapped via `config/blatui.php` | `foundation-docs` |
+| `home-ui` | Placing the home page under `resources/views/pages/home.blade.php` (based on the official BlatUI SaaS template `https://blatui.remix-it.com/templates/saas`), extracting reusable `<x-layouts.header>` and `<x-layouts.footer>` layout components driven by `config/blatui.php` (`navigation` and `footer`), and mapping `pages.home` in `config/blatui.php` | `foundation-docs`, `auth-ui` |
 
-Build order: `foundation-docs` → `ci-cd`, `auth-ui`
+Build order: `foundation-docs` → `ci-cd`, `auth-ui` → `home-ui`
 
 ---
 
@@ -23,7 +24,8 @@ Its core value proposition is **zero-friction project initialization**: a develo
 ### Current Initiative Scope
 1. **Lock Project Boundaries & Long-Term Memory (`foundation-docs`):** Establish `SPEC.md` and `docs/decisions/` (ADRs) alongside updated `README.md` and `AGENTS.md` guidelines so both human maintainers and Antigravity agents retain full architectural context across months.
 2. **Standard Laravel CI/CD (`ci-cd`):** Add GitHub Actions workflows for automated code style checks (Laravel Pint), frontend asset build verification (`npm run build`), and test execution (Pest 5).
-3. **Official BlatUI Auth Page Variants (`auth-ui`):** Instead of designing custom auth pages from scratch, pull the official BlatUI registry blocks (`login-01` to `login-05`, and optionally `signup-01` to `signup-05`) into `resources/views/pages/`, wire them with Laravel's auth routes/CSRF/validation attributes, and allow project creators to easily select or switch between variants.
+3. **Official BlatUI Auth Page Variants (`auth-ui`):** Pull the official BlatUI registry blocks (`login-01` to `login-05`, `signup-01` to `signup-05`) into `resources/views/pages/auth/`, wire them with Laravel's auth routes/CSRF/validation attributes, and allow project creators to easily select or switch between variants via `config/blatui.php`.
+4. **Configurable Home Page & Reusable Frontend Layout Components (`home-ui`):** Place the home page view at `resources/views/pages/home.blade.php` (using the official BlatUI SaaS template `https://blatui.remix-it.com/templates/saas`), extract reusable `<x-layouts.header>` (`resources/views/components/layouts/header.blade.php`) and `<x-layouts.footer>` (`resources/views/components/layouts/footer.blade.php`) components driven by `config('blatui.navigation')` and `config('blatui.footer')`, include dark/light theme toggling and `@auth` avatar dropdown / `@guest` sign-in buttons in `<x-layouts.header>`, map `pages.home` in `config/blatui.php` (`env('BLATUI_HOME_VIEW', 'pages.home')`), and resolve `route('home')` (`/`) dynamically from `config('blatui.pages.home')`.
 
 ---
 
@@ -231,16 +233,28 @@ Following `laravel-best-practices` and `testing-best-practices`:
 3. **Authentication UI (`auth-ui`):**
    - Official BlatUI auth blocks (`login-01`..`login-05` and `signup-01`..`signup-05`) are placed under `resources/views/pages/auth/` and wired with complete, working Laravel authentication (`method="POST"`, `action="{{ route('login') }}"` / `action="{{ route('register') }}"`, `@csrf`, `name` attributes, `old()` values, `<x-ui.field-error>`, session status alerts, and route links).
    - `config/blatui.php` defines `pages.auth.*` view mappings (`login`, `register`, `forgot_password`, `reset_password`, `verify_email`, `confirm_password`), allowing developers to switch between the 5 login and 5 signup styles via `config/blatui.php` or `.env` (`BLATUI_AUTH_LOGIN_VIEW`, `BLATUI_AUTH_REGISTER_VIEW`).
-   - No new non-auth pages are added; scope is strictly limited to `login-01`..`05`, `signup-01`..`05`, and existing auth/profile/dashboard/landing pages.
    - All existing auth feature tests in `tests/Feature/Auth/` pass (`php artisan test --compact tests/Feature/Auth`), and each variant is verified for functional form submission.
+4. **Home Page & Shared Frontend Layouts (`home-ui`):**
+   - `resources/views/pages/home.blade.php` exists and renders the official BlatUI SaaS template (`https://blatui.remix-it.com/templates/saas`) composed with `<x-layouts.app>`, `<x-layouts.header />`, the middle SaaS sections, and `<x-layouts.footer />`.
+   - `resources/views/components/layouts/header.blade.php` (`<x-layouts.header>`) renders the brand link (`route('home')`), navigation links from `config('blatui.navigation')`, theme toggle (`$store.theme.toggle()`), and `@auth` user avatar dropdown (`route('dashboard')`, `route('profile.edit')`, `route('logout')`) or `@guest` `Sign in` / `Get started` buttons.
+   - `resources/views/components/layouts/footer.blade.php` (`<x-layouts.footer>`) renders the footer columns from `config('blatui.footer')`.
+   - `config/blatui.php` defines `'home' => env('BLATUI_HOME_VIEW', 'pages.home')` under `pages`, along with `navigation` and `footer` arrays.
+   - `routes/web.php` resolves the `/` (`home`) route view dynamically from `config('blatui.pages.home', 'pages.home')`.
+   - Feature tests in `tests/Feature/ExampleTest.php` verify that `GET /` returns HTTP 200, renders `config('blatui.pages.home')`, renders guest and authenticated header states, and supports dynamic `config('blatui.navigation')` items.
 
 ---
 
 ## Resolved Decisions
 
 1. **Directory & Route Structure under `resources/views/pages/` (See `ADR-003`):**
-   - Store the 5 login variants (`login-01.blade.php` .. `login-05.blade.php`) and 5 signup variants (`signup-01.blade.php` .. `signup-05.blade.php`) in `resources/views/pages/auth/`.
-   - Each variant is a fully functional Laravel Blade view (not a static demo).
-   - Developers switch styles centrally via `config/blatui.php` (`pages.auth.login` / `pages.auth.register`) or `.env` variables (`BLATUI_AUTH_LOGIN_VIEW` / `BLATUI_AUTH_REGISTER_VIEW`).
+   - Store page-level views (`pages/home.blade.php`) and multi-variant auth templates (`pages/auth/login-01..05.blade.php`, `pages/auth/signup-01..05.blade.php`) under `resources/views/pages/`.
+   - Share `<x-layouts.header>` and `<x-layouts.footer>` across frontend pages so each page only defines its middle content while navigation and footer columns are managed in `config/blatui.php`.
+   - Developers switch page templates centrally via `config/blatui.php` (`pages.home`, `pages.auth.*`) or `.env` variables (`BLATUI_HOME_VIEW`, `BLATUI_AUTH_LOGIN_VIEW`, `BLATUI_AUTH_REGISTER_VIEW`).
 2. **Agent Workflow Codification (`AGENTS.md`):**
    - Codify the standard project workflow (Spec → ADR → Plan/Tasks → BlatUI MCP discovery & functional wiring → Pint + Pest verification) directly in `AGENTS.md` so future agent sessions autonomously discover BlatUI components/blocks via MCP without manual re-briefing.
+
+---
+
+## Open Questions
+
+- None currently.

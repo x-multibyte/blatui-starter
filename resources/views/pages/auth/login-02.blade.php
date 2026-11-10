@@ -1,6 +1,6 @@
 {{-- Source: https://blatui.remix-it.com/r/blocks/login-02.json --}}
 @php
-    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag;
 @endphp
 
 <x-layouts.app title="Login 02">
@@ -35,19 +35,37 @@
                             </div>
                             <x-ui.field>
                                 <x-ui.field-label for="email">Email</x-ui.field-label>
-                                <x-ui.input id="email" type="email" name="email" :value="old('email')" placeholder="m@example.com" required autofocus autocomplete="username" />
+                                <x-ui.input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    :value="old('email')"
+                                    placeholder="m@example.com"
+                                    required
+                                    autofocus
+                                    autocomplete="username"
+                                />
                                 <x-ui.field-error :messages="$errors->get('email')" />
                             </x-ui.field>
                             <x-ui.field>
                                 <div class="flex items-center">
                                     <x-ui.field-label for="password">Password</x-ui.field-label>
                                     @if (Route::has('password.request'))
-                                        <a href="{{ route('password.request') }}" class="ml-auto text-sm underline-offset-4 hover:underline">
+                                        <a
+                                            href="{{ route('password.request') }}"
+                                            class="ml-auto text-sm underline-offset-4 hover:underline"
+                                        >
                                             Forgot your password?
                                         </a>
                                     @endif
                                 </div>
-                                <x-ui.input id="password" type="password" name="password" required autocomplete="current-password" />
+                                <x-ui.input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    autocomplete="current-password"
+                                />
                                 <x-ui.field-error :messages="$errors->get('password')" />
                             </x-ui.field>
                             <x-ui.field orientation="horizontal">
@@ -68,7 +86,8 @@
                                 @if (Route::has('register'))
                                     <x-ui.field-description class="text-center">
                                         Don't have an account?
-                                        <a href="{{ route('register') }}" class="underline underline-offset-4">Sign up</a>
+                                        <a href="{{ route('register') }}" class="underline underline-offset-4"
+                                            >Sign up</a>
                                     </x-ui.field-description>
                                 @endif
                             </x-ui.field>
@@ -78,8 +97,11 @@
             </div>
         </div>
         <div class="bg-muted relative hidden lg:block">
-            <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80&auto=format&fit=crop" alt=""
-                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+            <img
+                src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80&auto=format&fit=crop"
+                alt=""
+                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            />
         </div>
     </div>
 </x-layouts.app>

@@ -29,12 +29,15 @@
 @endphp
 
 <x-layouts.app :title="$title ?? $heading">
-    <x-ui.sidebar-provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);">
+    <x-ui.sidebar-provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12)">
         <x-ui.sidebar collapsible="offcanvas" variant="inset">
             <x-ui.sidebar-header>
                 <x-ui.sidebar-menu>
                     <x-ui.sidebar-menu-item>
-                        <x-ui.sidebar-menu-button class="data-[slot=sidebar-menu-button]:p-1.5!" :href="route('dashboard')">
+                        <x-ui.sidebar-menu-button
+                            class="data-[slot=sidebar-menu-button]:p-1.5!"
+                            :href="route('dashboard')"
+                        >
                             <x-lucide-command class="size-5!" />
                             <span class="text-base font-semibold">{{ config('app.name') }}</span>
                         </x-ui.sidebar-menu-button>
@@ -47,11 +50,15 @@
                     <x-ui.sidebar-group-content class="flex flex-col gap-2">
                         <x-ui.sidebar-menu>
                             <x-ui.sidebar-menu-item class="flex items-center gap-2">
-                                <x-ui.sidebar-menu-button class="bg-primary text-primary-foreground min-w-8 duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground">
+                                <x-ui.sidebar-menu-button class="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear">
                                     <x-lucide-circle-plus />
                                     <span>Quick Create</span>
                                 </x-ui.sidebar-menu-button>
-                                <x-ui.button size="icon" variant="outline" class="size-8 group-data-[collapsible=icon]:opacity-0">
+                                <x-ui.button
+                                    size="icon"
+                                    variant="outline"
+                                    class="size-8 group-data-[collapsible=icon]:opacity-0"
+                                >
                                     <x-lucide-mail />
                                     <span class="sr-only">Inbox</span>
                                 </x-ui.button>
@@ -82,16 +89,22 @@
                                 </x-ui.sidebar-menu-button>
                                 <x-ui.dropdown-menu>
                                     <x-ui.dropdown-menu-trigger>
-                                        <x-ui.sidebar-menu-action :show-on-hover="true" class="data-[state=open]:bg-accent rounded-sm">
+                                        <x-ui.sidebar-menu-action
+                                            :show-on-hover="true"
+                                            class="data-[state=open]:bg-accent rounded-sm"
+                                        >
                                             <x-lucide-more-horizontal />
                                             <span class="sr-only">More</span>
                                         </x-ui.sidebar-menu-action>
                                     </x-ui.dropdown-menu-trigger>
                                     <x-ui.dropdown-menu-content class="w-24 rounded-lg" side="right" align="start">
-                                        <x-ui.dropdown-menu-item><x-lucide-folder /><span>Open</span></x-ui.dropdown-menu-item>
-                                        <x-ui.dropdown-menu-item><x-lucide-share-2 /><span>Share</span></x-ui.dropdown-menu-item>
+                                        <x-ui.dropdown-menu-item>
+                                            <x-lucide-folder /><span>Open</span></x-ui.dropdown-menu-item>
+                                        <x-ui.dropdown-menu-item>
+                                            <x-lucide-share-2 /><span>Share</span></x-ui.dropdown-menu-item>
                                         <x-ui.dropdown-menu-separator />
-                                        <x-ui.dropdown-menu-item variant="destructive"><x-lucide-trash-2 /><span>Delete</span></x-ui.dropdown-menu-item>
+                                        <x-ui.dropdown-menu-item variant="destructive">
+                                            <x-lucide-trash-2 /><span>Delete</span></x-ui.dropdown-menu-item>
                                     </x-ui.dropdown-menu-content>
                                 </x-ui.dropdown-menu>
                             </x-ui.sidebar-menu-item>
@@ -132,14 +145,10 @@
                 <x-ui.sidebar-trigger class="-ml-1" />
                 <x-ui.separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
                 <h1 class="text-base font-medium">{{ $heading ?? $title }}</h1>
-                <div class="ml-auto flex items-center gap-2">
-                    {{ $actions ?? '' }}
-                </div>
+                <div class="ml-auto flex items-center gap-2">{{ $actions ?? '' }}</div>
             </header>
 
-            <div class="flex flex-1 flex-col">
-                {{ $slot }}
-            </div>
+            <div class="flex flex-1 flex-col">{{ $slot }}</div>
         </x-ui.sidebar-inset>
     </x-ui.sidebar-provider>
 </x-layouts.app>

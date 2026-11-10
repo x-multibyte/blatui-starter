@@ -10,9 +10,18 @@
                     Acme
                 </a>
                 <nav class="text-muted-foreground ml-2 hidden items-center gap-1 text-sm md:flex">
-                    <a href="#features" class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors">Features</a>
-                    <a href="#testimonial" class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors">Customers</a>
-                    <a href="#cta" class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors">Pricing</a>
+                    <a
+                        href="#features"
+                        class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors"
+                    >Features</a>
+                    <a
+                        href="#testimonial"
+                        class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors"
+                    >Customers</a>
+                    <a
+                        href="#cta"
+                        class="hover:text-foreground hover:bg-accent/60 rounded-md px-3 py-1.5 font-medium transition-colors"
+                    >Pricing</a>
                 </nav>
                 <div class="ml-auto flex items-center gap-2">
                     @auth
@@ -34,7 +43,10 @@
                     <div class="from-primary/25 h-96 w-[820px] rounded-full bg-gradient-to-b to-transparent blur-3xl"></div>
                 </div>
                 <div class="mx-auto max-w-3xl px-6 py-24 text-center lg:py-32">
-                    <a href="#" class="bg-muted hover:bg-accent mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors">
+                    <a
+                        href="#"
+                        class="bg-muted hover:bg-accent mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+                    >
                         <x-ui.badge class="rounded-full">New</x-ui.badge>
                         Introducing v2.0 — now with realtime
                         <x-lucide-arrow-right class="size-3.5" />
@@ -43,11 +55,13 @@
                         Ship your product at the speed of thought
                     </h1>
                     <p class="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg text-pretty">
-                        The all-in-one platform to build, launch and scale modern apps. Beautiful by default,
-                        accessible everywhere, and yours to own.
+                        The all-in-one platform to build, launch and scale modern apps. Beautiful by default, accessible
+                        everywhere, and yours to own.
                     </p>
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-                        <x-ui.button size="lg" href="#cta">Start for free <x-lucide-arrow-right class="size-4" /></x-ui.button>
+                        <x-ui.button size="lg" href="#cta">
+                            Start for free <x-lucide-arrow-right class="size-4"
+                        /></x-ui.button>
                         <x-ui.button size="lg" variant="outline" href="#">
                             <x-lucide-circle-play class="size-4" /> Watch demo
                         </x-ui.button>
@@ -57,7 +71,9 @@
 
                 {{-- Logo cloud --}}
                 <div class="mx-auto max-w-5xl px-6 pb-16 lg:px-8">
-                    <p class="text-muted-foreground mb-6 text-center text-xs font-medium tracking-wide uppercase">Trusted by teams at</p>
+                    <p class="text-muted-foreground mb-6 text-center text-xs font-medium tracking-wide uppercase">
+                        Trusted by teams at
+                    </p>
                     <div class="text-muted-foreground/70 grid grid-cols-2 items-center justify-items-center gap-8 sm:grid-cols-3 md:grid-cols-5">
                         @foreach (['Vercel', 'Linear', 'Raycast', 'Supabase', 'Stripe'] as $logo)
                             <span class="text-lg font-semibold tracking-tight">{{ $logo }}</span>
@@ -71,8 +87,12 @@
                 <div class="mx-auto max-w-6xl px-6 lg:px-8">
                     <div class="mx-auto max-w-2xl text-center">
                         <x-ui.badge variant="secondary">Features</x-ui.badge>
-                        <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Everything you need, nothing you don't</h2>
-                        <p class="text-muted-foreground mt-4 text-lg">A thoughtful set of primitives that scale from prototype to production.</p>
+                        <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                            Everything you need, nothing you don't
+                        </h2>
+                        <p class="text-muted-foreground mt-4 text-lg">
+                            A thoughtful set of primitives that scale from prototype to production.
+                        </p>
                     </div>
                     <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         @php
@@ -121,7 +141,8 @@
                         @endfor
                     </div>
                     <blockquote class="text-2xl font-medium tracking-tight text-balance sm:text-3xl">
-                        “We replaced three tools and shipped our redesign in a weekend. The team has never moved faster.”
+                        “We replaced three tools and shipped our redesign in a weekend. The team has never moved
+                        faster.”
                     </blockquote>
                     <div class="mt-8 flex items-center justify-center gap-3">
                         <x-ui.avatar>
@@ -140,11 +161,25 @@
             <section id="cta" class="border-t py-24">
                 <div class="mx-auto max-w-5xl px-6 lg:px-8">
                     <div class="bg-primary text-primary-foreground relative overflow-hidden rounded-2xl px-8 py-16 text-center shadow-sm">
-                        <h2 class="text-3xl font-bold tracking-tight text-balance sm:text-4xl">Ready to build something great?</h2>
-                        <p class="text-primary-foreground/80 mx-auto mt-4 max-w-xl text-lg">Start free today. Upgrade when you're ready — no lock-in, ever.</p>
+                        <h2 class="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+                            Ready to build something great?
+                        </h2>
+                        <p class="text-primary-foreground/80 mx-auto mt-4 max-w-xl text-lg">
+                            Start free today. Upgrade when you're ready — no lock-in, ever.
+                        </p>
                         <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-                            <x-ui.button size="lg" variant="secondary" :href="auth()->check() ? route('dashboard') : route('register')">Get started free</x-ui.button>
-                            <x-ui.button size="lg" variant="outline" href="#" class="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                            <x-ui.button
+                                size="lg"
+                                variant="secondary"
+                                :href="auth()->check() ? route('dashboard') : route('register')"
+                            >
+                                Get started free</x-ui.button>
+                            <x-ui.button
+                                size="lg"
+                                variant="outline"
+                                href="#"
+                                class="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground bg-transparent"
+                            >
                                 Talk to sales
                             </x-ui.button>
                         </div>

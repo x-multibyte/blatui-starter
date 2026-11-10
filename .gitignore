@@ -19,6 +19,9 @@
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+/public/vendor
+__pycache__/
+*.pyc
 /storage/*.key
 /storage/pail
 /vendor

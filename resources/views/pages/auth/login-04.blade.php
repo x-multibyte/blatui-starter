@@ -1,6 +1,6 @@
 {{-- Source: https://blatui.remix-it.com/r/blocks/login-04.json --}}
 @php
-    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag;
 @endphp
 
 <x-layouts.app title="Login 04">
@@ -15,9 +15,7 @@
                             <x-ui.field-group>
                                 <div class="flex flex-col items-center gap-2 text-center">
                                     <h1 class="text-2xl font-bold">Welcome back</h1>
-                                    <p class="text-muted-foreground text-balance">
-                                        Login to your Acme Inc account
-                                    </p>
+                                    <p class="text-muted-foreground text-balance">Login to your Acme Inc account</p>
                                 </div>
 
                                 @if (session('status'))
@@ -29,24 +27,43 @@
 
                                 <x-ui.field>
                                     <x-ui.field-label for="email">Email</x-ui.field-label>
-                                    <x-ui.input id="email" type="email" name="email" :value="old('email')" placeholder="m@example.com" required autofocus autocomplete="username" />
+                                    <x-ui.input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        :value="old('email')"
+                                        placeholder="m@example.com"
+                                        required
+                                        autofocus
+                                        autocomplete="username"
+                                    />
                                     <x-ui.field-error :messages="$errors->get('email')" />
                                 </x-ui.field>
                                 <x-ui.field>
                                     <div class="flex items-center">
                                         <x-ui.field-label for="password">Password</x-ui.field-label>
                                         @if (Route::has('password.request'))
-                                            <a href="{{ route('password.request') }}" class="ml-auto text-sm underline-offset-2 hover:underline">
+                                            <a
+                                                href="{{ route('password.request') }}"
+                                                class="ml-auto text-sm underline-offset-2 hover:underline"
+                                            >
                                                 Forgot your password?
                                             </a>
                                         @endif
                                     </div>
-                                    <x-ui.input id="password" type="password" name="password" required autocomplete="current-password" />
+                                    <x-ui.input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        required
+                                        autocomplete="current-password"
+                                    />
                                     <x-ui.field-error :messages="$errors->get('password')" />
                                 </x-ui.field>
                                 <x-ui.field orientation="horizontal">
                                     <x-ui.checkbox id="remember_me" name="remember" />
-                                    <x-ui.field-label for="remember_me" class="font-normal">Remember me</x-ui.field-label>
+                                    <x-ui.field-label for="remember_me" class="font-normal">
+                                        Remember me</x-ui.field-label>
                                 </x-ui.field>
                                 <x-ui.field>
                                     <x-ui.button type="submit">Login</x-ui.button>
@@ -76,20 +93,25 @@
                                 </x-ui.field>
                                 @if (Route::has('register'))
                                     <x-ui.field-description class="text-center">
-                                        Don't have an account? <a href="{{ route('register') }}" class="underline underline-offset-4">Sign up</a>
+                                        Don't have an account?
+                                        <a href="{{ route('register') }}" class="underline underline-offset-4"
+                                            >Sign up</a>
                                     </x-ui.field-description>
                                 @endif
                             </x-ui.field-group>
                         </form>
                         <div class="bg-muted relative hidden md:block">
-                            <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80&auto=format&fit=crop" alt=""
-                                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+                            <img
+                                src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80&auto=format&fit=crop"
+                                alt=""
+                                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                            />
                         </div>
                     </x-ui.card-content>
                 </x-ui.card>
                 <x-ui.field-description class="px-6 text-center">
-                    By clicking continue, you agree to our <a href="#">Terms of Service</a>
-                    and <a href="#">Privacy Policy</a>.
+                    By clicking continue, you agree to our <a href="#">Terms of Service</a> and
+                    <a href="#">Privacy Policy</a>.
                 </x-ui.field-description>
             </div>
         </div>

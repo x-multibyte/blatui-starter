@@ -26,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Blaze::optimize()->in(resource_path('views/components/ui'));
+        if (is_dir($dir = config('blatui.component_directory'))) {
+            Blaze::optimize()->in($dir);
+        }
     }
 }

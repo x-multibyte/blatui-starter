@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landing')->name('home');
+Route::get('/', HomeController::class)->name('home');
+Route::get('/forge', fn () => view(config('blatui.pages.forge')))->name('forge');
 
 Route::view('/dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

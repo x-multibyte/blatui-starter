@@ -23,12 +23,29 @@
                             </div>
                             <x-ui.field>
                                 <x-ui.field-label for="name">Full Name</x-ui.field-label>
-                                <x-ui.input id="name" type="text" name="name" :value="old('name')" placeholder="John Doe" required autofocus autocomplete="name" />
+                                <x-ui.input
+                                    id="name"
+                                    type="text"
+                                    name="name"
+                                    :value="old('name')"
+                                    placeholder="John Doe"
+                                    required
+                                    autofocus
+                                    autocomplete="name"
+                                />
                                 <x-ui.field-error :messages="$errors->get('name')" />
                             </x-ui.field>
                             <x-ui.field>
                                 <x-ui.field-label for="email">Email</x-ui.field-label>
-                                <x-ui.input id="email" type="email" name="email" :value="old('email')" placeholder="m@example.com" required autocomplete="username" />
+                                <x-ui.input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    :value="old('email')"
+                                    placeholder="m@example.com"
+                                    required
+                                    autocomplete="username"
+                                />
                                 <x-ui.field-error :messages="$errors->get('email')" />
                                 <x-ui.field-description>
                                     We'll use this to contact you. We will not share your email with anyone else.
@@ -36,15 +53,25 @@
                             </x-ui.field>
                             <x-ui.field>
                                 <x-ui.field-label for="password">Password</x-ui.field-label>
-                                <x-ui.input id="password" type="password" name="password" required autocomplete="new-password" />
+                                <x-ui.input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    autocomplete="new-password"
+                                />
                                 <x-ui.field-error :messages="$errors->get('password')" />
-                                <x-ui.field-description>
-                                    Must be at least 8 characters long.
-                                </x-ui.field-description>
+                                <x-ui.field-description> Must be at least 8 characters long. </x-ui.field-description>
                             </x-ui.field>
                             <x-ui.field>
                                 <x-ui.field-label for="password_confirmation">Confirm Password</x-ui.field-label>
-                                <x-ui.input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" />
+                                <x-ui.input
+                                    id="password_confirmation"
+                                    type="password"
+                                    name="password_confirmation"
+                                    required
+                                    autocomplete="new-password"
+                                />
                                 <x-ui.field-error :messages="$errors->get('password_confirmation')" />
                                 <x-ui.field-description>Please confirm your password.</x-ui.field-description>
                             </x-ui.field>
@@ -58,7 +85,8 @@
                                     Sign up with GitHub
                                 </x-ui.button>
                                 <x-ui.field-description class="px-6 text-center">
-                                    Already have an account? <a href="{{ route('login') }}" class="underline underline-offset-4">Sign in</a>
+                                    Already have an account?
+                                    <a href="{{ route('login') }}" class="underline underline-offset-4">Sign in</a>
                                 </x-ui.field-description>
                             </x-ui.field>
                         </x-ui.field-group>
@@ -67,8 +95,11 @@
             </div>
         </div>
         <div class="bg-muted relative hidden lg:block">
-            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80&auto=format&fit=crop" alt=""
-                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+            <img
+                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80&auto=format&fit=crop"
+                alt=""
+                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            />
         </div>
     </div>
 </x-layouts.app>

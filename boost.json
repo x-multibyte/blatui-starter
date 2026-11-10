@@ -8,7 +8,8 @@
     "nightwatch": false,
     "packages": [
         "anousss007/blatui",
-        "pestphp/pest-plugin-agent"
+        "pestphp/pest-plugin-agent",
+        "livewire/blaze"
     ],
     "sail": false,
     "skills": [
@@ -18,6 +19,7 @@
         "livewire-development",
         "tailwindcss-development",
         "blatui-development",
+        "blaze-optimize",
         "pest-plugin-agent"
     ]
 }

@@ -76,6 +76,8 @@ Open **<http://localhost:8000>** to explore the landing page, analytics dashboar
 ### Pre-Installed Layout Shells
 
 - `<x-layouts.app>`: Base HTML shell featuring flash-free theme initialization script (`dark` mode toggle support).
+- `<x-layouts.header>`: Shared frontend top navigation header driven by `config('blatui.navigation')`, featuring a dark/light theme toggle button and `@auth` user avatar dropdown (`Dashboard`, `Settings`, `Log out`) / `@guest` (`Sign in`, `Get started`) actions.
+- `<x-layouts.footer>`: Shared multi-column frontend footer driven by `config('blatui.footer')`.
 - `<x-layouts.auth>`: Centered layout card shell for authentication views.
 - `<x-layouts.dashboard>`: Comprehensive dashboard shell with collapsible inset sidebar (`<x-block.sidebar-*>`), command search, breadcrumbs, and user dropdown.
 
@@ -132,6 +134,8 @@ To switch authentication layout styles, update `config/blatui.php` (or set the c
 ```php
 // config/blatui.php
 'pages' => [
+    'home' => env('BLATUI_HOME_VIEW', 'pages.home'),
+
     'auth' => [
         // Available: 'pages.auth.login-01' through 'pages.auth.login-05'
         'login' => env('BLATUI_AUTH_LOGIN_VIEW', 'pages.auth.login-01'),

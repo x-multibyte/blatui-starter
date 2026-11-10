@@ -1,4 +1,8 @@
-<x-layouts.auth title="Forgot password" heading="Forgot your password?" description="Enter your email address and we will email you a link to choose a new one.">
+<x-layouts.auth
+    title="Forgot password"
+    heading="Forgot your password?"
+    description="Enter your email address and we will email you a link to choose a new one."
+>
     @if (session('status'))
         <x-ui.alert tone="success" class="mb-6">
             <x-lucide-circle-check />
@@ -12,7 +16,15 @@
         <x-ui.field-group>
             <x-ui.field>
                 <x-ui.field-label for="email">Email</x-ui.field-label>
-                <x-ui.input id="email" type="email" name="email" :value="old('email')" placeholder="m@example.com" required autofocus />
+                <x-ui.input
+                    id="email"
+                    type="email"
+                    name="email"
+                    :value="old('email')"
+                    placeholder="m@example.com"
+                    required
+                    autofocus
+                />
                 <x-ui.field-error :messages="$errors->get('email')" />
             </x-ui.field>
 

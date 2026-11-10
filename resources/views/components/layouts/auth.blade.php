@@ -25,9 +25,7 @@
                         @endif
                     </x-ui.card-header>
                 @endif
-                <x-ui.card-content>
-                    {{ $slot }}
-                </x-ui.card-content>
+                <x-ui.card-content> {{ $slot }} </x-ui.card-content>
             </x-ui.card>
         </div>
     </div>

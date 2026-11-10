@@ -16,13 +16,28 @@
             <x-ui.field-group>
                 <x-ui.field>
                     <x-ui.field-label for="name">Name</x-ui.field-label>
-                    <x-ui.input id="name" name="name" type="text" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+                    <x-ui.input
+                        id="name"
+                        name="name"
+                        type="text"
+                        :value="old('name', $user->name)"
+                        required
+                        autofocus
+                        autocomplete="name"
+                    />
                     <x-ui.field-error :messages="$errors->get('name')" />
                 </x-ui.field>
 
                 <x-ui.field>
                     <x-ui.field-label for="email">Email</x-ui.field-label>
-                    <x-ui.input id="email" name="email" type="email" :value="old('email', $user->email)" required autocomplete="username" />
+                    <x-ui.input
+                        id="email"
+                        name="email"
+                        type="email"
+                        :value="old('email', $user->email)"
+                        required
+                        autocomplete="username"
+                    />
                     <x-ui.field-error :messages="$errors->get('email')" />
 
                     @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
@@ -49,9 +64,11 @@
                             x-data="{ show: true }"
                             x-show="show"
                             x-transition
-                            x-init="setTimeout(() => show = false, 2000)"
+                            x-init="setTimeout(() => (show = false), 2000)"
                             class="text-muted-foreground text-sm"
-                        >Saved.</p>
+                        >
+                            Saved.
+                        </p>
                     @endif
                 </div>
             </x-ui.field-group>

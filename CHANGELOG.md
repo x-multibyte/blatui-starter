@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Configurable SaaS Home Page (`resources/views/pages/home.blade.php`):** Added the official BlatUI SaaS landing page (`https://blatui.remix-it.com/templates/saas`) under `resources/views/pages/home.blade.php`, mapped via `config('blatui.pages.home')` (`BLATUI_HOME_VIEW`) and wired to `route('home')` (`/`).
+- **Reusable Frontend Header & Footer Layout Components (`<x-layouts.header>` & `<x-layouts.footer>`):** Extracted `resources/views/components/layouts/header.blade.php` and `resources/views/components/layouts/footer.blade.php` driven by `config('blatui.navigation')` and `config('blatui.footer')`, with built-in dark/light mode toggle (`$store.theme.toggle()`) and `@auth` user avatar dropdown / `@guest` sign-in & registration controls.
+
 ## [0.0.4] - 2026-11-10
 
 ### Added
