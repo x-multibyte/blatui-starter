@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-11-10
+
 ### Added
 - **BlatUI Page Appearance Configuration (`config/blatui.php`):** Added `config/blatui.php` with `pages.auth.*` view mappings (`login`, `register`, `forgot_password`, `reset_password`, `verify_email`, `confirm_password`) and `.env` overrides (`BLATUI_AUTH_LOGIN_VIEW`, `BLATUI_AUTH_REGISTER_VIEW`, etc.), wired into all authentication controllers and `resources/views/auth/*` compatibility views.
 
