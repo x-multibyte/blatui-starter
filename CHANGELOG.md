@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 - **Deterministic Test Environment:** `phpunit.xml` now forces `APP_ENV=testing` through both `<env>` and `<server>` entries, so an ambient `APP_ENV` from the host shell (for example `APP_ENV=local`) can no longer disable Laravel's testing mode. Previously this activated CSRF middleware and made every CSRF-protected POST test fail with HTTP 419.
+- **Styled Browser-Test Screenshots:** `tests/TestCase.php` now stubs Vite only when `public/build/manifest.json` is missing. Browser tests and `visit()->screenshot()` captures load the compiled CSS/JS whenever frontend assets are built, while fresh clones can still run the suite without a build.
 
 ## [0.0.5] - 2026-11-10
 
