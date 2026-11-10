@@ -18,8 +18,9 @@ However, upstream BlatUI blocks are static UI templates (`<form>` with no `metho
 2. **Make every variant 100% functional out of the box:**
    - Wire all 5 login views to `POST {{ route('login') }}` with `@csrf`, `name="email"`, `name="password"`, `name="remember"`, `:value="old('email')"`, `<x-ui.field-error>`, session status alert (`session('status')`), and named route links (`password.request`, `register`, `home`).
    - Wire all 5 signup views to `POST {{ route('register') }}` with `@csrf`, `name="name"`, `name="email"`, `name="password"`, `name="password_confirmation"`, `:value="old(...)"`, `<x-ui.field-error>`, and named route links (`login`, `home`).
-3. **Switch variants directly via `view()` call (no extra config file):**
-   - `AuthenticatedSessionController::create()` renders `view('pages.auth.login-01')` by default (and `RegisteredUserController::create()` renders `view('pages.auth.signup-01')`), allowing project creators to switch styles by changing a single `view(...)` argument.
+3. **Switch variants centrally via `config/blatui.php`:**
+   - `config/blatui.php` defines `pages.auth.*` mappings (`login`, `register`, `forgot_password`, `reset_password`, `verify_email`, `confirm_password`) with `.env` overrides (`BLATUI_AUTH_LOGIN_VIEW`, `BLATUI_AUTH_REGISTER_VIEW`, etc.).
+   - Auth controllers (`AuthenticatedSessionController`, `RegisteredUserController`, etc.) and `resources/views/auth/*` compatibility wrappers read directly from `config('blatui.pages.auth.*')` so developers can switch Blade templates in one place without editing controllers.
 
 ## Alternatives Considered
 
@@ -28,10 +29,10 @@ However, upstream BlatUI blocks are static UI templates (`<form>` with no `metho
 - **Cons:** Forces a single layout opinion on every downstream project and ignores BlatUI's official `login-01`..`05` and `signup-01`..`05` blocks.
 - **Rejected:** Providing all 5 official BlatUI variants pre-wired with Laravel auth gives starter-kit users much higher leverage.
 
-### Dedicated Config File (`config/starter.php`) for Auth Theme Switching
-- **Pros:** Allows switching via `.env`.
-- **Cons:** Adds unnecessary configuration surface area for a decision a developer makes once when starting a project.
-- **Rejected:** Changing `view('pages.auth.login-01')` in the controller is simpler, explicit, and idiomatic Laravel.
+### Separate Custom Config File (`config/starter.php`) or Overloaded Theme Config
+- **Pros:** Isolates starter-specific config or bundles CSS token settings.
+- **Cons:** Introduces speculative configuration surface area (such as unused `registries` placeholders or CSS token overrides that belong in `resources/css/blatui.css`).
+- **Rejected:** Following first principles, `config/blatui.php` contains strictly the active `pages.auth.*` Blade view mappings needed to switch page templates, with zero unused placeholders.
 
 ## Consequences
 - All 10 official BlatUI login/signup variants are pre-installed and functionally wired in `resources/views/pages/auth/`.

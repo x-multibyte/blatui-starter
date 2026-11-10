@@ -125,31 +125,29 @@ Each auth variant includes:
 - Session status alerts (`session('status')`) for password resets and verification prompts.
 - Real named route links for password recovery (`route('password.request')`), registration (`route('register')`), login (`route('login')`), and brand home (`route('home')`) — no broken `#` placeholders.
 
-### Switching Auth Variants in One Line
+### Switching Auth Variants via `config/blatui.php`
 
-To switch authentication layout styles, change a single `view(...)` argument in the corresponding controller:
-
-#### Login Style Selection (`app/Http/Controllers/Auth/AuthenticatedSessionController.php`):
+To switch authentication layout styles, update `config/blatui.php` (or set the corresponding `.env` variables):
 
 ```php
-public function create(): View
-{
-    // Choose your preferred style: 'pages.auth.login-01' through 'pages.auth.login-05'
-    return view('pages.auth.login-01');
-}
+// config/blatui.php
+'pages' => [
+    'auth' => [
+        // Available: 'pages.auth.login-01' through 'pages.auth.login-05'
+        'login' => env('BLATUI_AUTH_LOGIN_VIEW', 'pages.auth.login-01'),
+
+        // Available: 'pages.auth.signup-01' through 'pages.auth.signup-05'
+        'register' => env('BLATUI_AUTH_REGISTER_VIEW', 'pages.auth.signup-01'),
+
+        'forgot_password' => env('BLATUI_AUTH_FORGOT_PASSWORD_VIEW', 'pages.auth.forgot-password'),
+        'reset_password' => env('BLATUI_AUTH_RESET_PASSWORD_VIEW', 'pages.auth.reset-password'),
+        'verify_email' => env('BLATUI_AUTH_VERIFY_EMAIL_VIEW', 'pages.auth.verify-email'),
+        'confirm_password' => env('BLATUI_AUTH_CONFIRM_PASSWORD_VIEW', 'pages.auth.confirm-password'),
+    ],
+],
 ```
 
-#### Registration Style Selection (`app/Http/Controllers/Auth/RegisteredUserController.php`):
-
-```php
-public function create(): View
-{
-    // Choose your preferred style: 'pages.auth.signup-01' through 'pages.auth.signup-05'
-    return view('pages.auth.signup-01');
-}
-```
-
-*(Thin backwards-compatible aliases remain in `resources/views/auth/*` so existing route configurations continue to work smoothly).*
+*(Auth controllers and the backwards-compatible wrappers in `resources/views/auth/*` automatically resolve their Blade views from `config('blatui.pages.auth.*')`).*
 
 ---
 

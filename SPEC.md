@@ -230,7 +230,7 @@ Following `laravel-best-practices` and `testing-best-practices`:
    - Local execution of `composer run test` and `npm run build` passes with zero errors.
 3. **Authentication UI (`auth-ui`):**
    - Official BlatUI auth blocks (`login-01`..`login-05` and `signup-01`..`signup-05`) are placed under `resources/views/pages/auth/` and wired with complete, working Laravel authentication (`method="POST"`, `action="{{ route('login') }}"` / `action="{{ route('register') }}"`, `@csrf`, `name` attributes, `old()` values, `<x-ui.field-error>`, session status alerts, and route links).
-   - `AuthenticatedSessionController::create()` and `RegisteredUserController::create()` (or the active `auth.login` / `auth.register` views) allow switching between the 5 login and 5 signup styles simply by changing the `view(...)` call (no extra config file needed).
+   - `config/blatui.php` defines `pages.auth.*` view mappings (`login`, `register`, `forgot_password`, `reset_password`, `verify_email`, `confirm_password`), allowing developers to switch between the 5 login and 5 signup styles via `config/blatui.php` or `.env` (`BLATUI_AUTH_LOGIN_VIEW`, `BLATUI_AUTH_REGISTER_VIEW`).
    - No new non-auth pages are added; scope is strictly limited to `login-01`..`05`, `signup-01`..`05`, and existing auth/profile/dashboard/landing pages.
    - All existing auth feature tests in `tests/Feature/Auth/` pass (`php artisan test --compact tests/Feature/Auth`), and each variant is verified for functional form submission.
 
@@ -241,6 +241,6 @@ Following `laravel-best-practices` and `testing-best-practices`:
 1. **Directory & Route Structure under `resources/views/pages/` (See `ADR-003`):**
    - Store the 5 login variants (`login-01.blade.php` .. `login-05.blade.php`) and 5 signup variants (`signup-01.blade.php` .. `signup-05.blade.php`) in `resources/views/pages/auth/`.
    - Each variant is a fully functional Laravel Blade view (not a static demo).
-   - Developers switch styles directly via the `view('pages.auth.login-01')` / `view('pages.auth.signup-01')` call in the controller (or active auth view) without extra configuration overhead.
+   - Developers switch styles centrally via `config/blatui.php` (`pages.auth.login` / `pages.auth.register`) or `.env` variables (`BLATUI_AUTH_LOGIN_VIEW` / `BLATUI_AUTH_REGISTER_VIEW`).
 2. **Agent Workflow Codification (`AGENTS.md`):**
    - Codify the standard project workflow (Spec → ADR → Plan/Tasks → BlatUI MCP discovery & functional wiring → Pint + Pest verification) directly in `AGENTS.md` so future agent sessions autonomously discover BlatUI components/blocks via MCP without manual re-briefing.

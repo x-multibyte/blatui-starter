@@ -11,7 +11,7 @@ We are hardening `x-multibyte/blatui-starter` (`v0.0.2`) across three capability
 
 - **[ADR-001: Pre-bundle All BlatUI Components with Locked Dependencies and Manual Upstream Review](../docs/decisions/ADR-001-prebundle-and-lock-blatui-components.md)** — Keep all 180+ `<x-ui.*>` components and peer dependencies locked; never run unattended upstream overwrite scripts.
 - **[ADR-002: Standard Laravel GitHub Actions CI with Pint and Pest](../docs/decisions/ADR-002-ci-cd-and-quality-gates.md)** — Enforce `composer run lint:check`, `npm ci && npm run build`, and `php artisan test` in GitHub Actions.
-- **[ADR-003: Multi-Variant Functional Auth Pages from BlatUI Registry Blocks](../docs/decisions/ADR-003-multi-variant-auth-pages-via-blatui-blocks.md)** — Store functional `login-01`..`05` and `signup-01`..`05` views in `resources/views/pages/auth/` and switch directly via the controller's `view(...)` call without extra config files.
+- **[ADR-003: Multi-Variant Functional Auth Pages from BlatUI Registry Blocks](../docs/decisions/ADR-003-multi-variant-auth-pages-via-blatui-blocks.md)** — Store functional `login-01`..`05` and `signup-01`..`05` views in `resources/views/pages/auth/` and switch variants centrally via `config/blatui.php` (`pages.auth.*`).
 
 ## Execution & Verification Model
 
@@ -81,4 +81,4 @@ Detailed task specifications and acceptance criteria are tracked in [`tasks/todo
 
 ## Open Questions
 
-- None — all scope, directory structure (`resources/views/pages/auth/`), and variant-switching decisions (`view('pages.auth.login-01')`) have been confirmed.
+- None — all scope, directory structure (`resources/views/pages/auth/`), and variant-switching decisions (`config/blatui.php` `pages.auth.*`) have been confirmed.

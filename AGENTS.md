@@ -305,9 +305,11 @@ Follow the structured `using-agent-skills` engineering sequence across sessions:
   - Specialized blocks: `calendar-01` through `calendar-32`
 - When porting an upstream block into the application, cite the upstream source URL in a comment header at the top of the file (e.g., `{{-- Source: https://blatui.remix-it.com/r/blocks/login-01.json --}}`).
 
-## Page Directory Convention (`resources/views/pages/`)
+## Page Directory & Configuration Convention (`resources/views/pages/` & `config/blatui.php`)
 
 - Place all page-level Blade views and multi-variant page templates in `resources/views/pages/` (e.g., `resources/views/pages/auth/login-01.blade.php`..`05`, `signup-01.blade.php`..`05`).
+- Map active page variants centrally in [`config/blatui.php`](config/blatui.php) under `pages.*` (e.g., `config('blatui.pages.auth.login')`, `config('blatui.pages.auth.register')`) and resolve them dynamically in controllers and view wrappers.
+- **First-Principles Scope Discipline:** Only add configuration keys and code that solve the active problem at hand. Never add speculative placeholders, commented-out dummy arrays, or CSS token configurations in PHP config files.
 - Ensure every page template is **100% functionally wired** to Laravel backend conventions:
   - Valid `method="POST"` actions pointing to named routes (`action="{{ route('login') }}"`, `action="{{ route('register') }}"`).
   - `@csrf` token directive present on every form.

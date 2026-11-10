@@ -84,7 +84,7 @@ Full-page **blocks** (dashboards, auth, marketing, pricing, sidebars, calendars)
 
 In `x-multibyte/blatui-starter`, all 180+ `<x-ui.*>` components and 8 `<x-block.*>` building blocks are already pre-bundled in `resources/views/components/`. When porting a full-page block into the application:
 
-1. **Target Directory:** Save page-level views and multi-variant templates under `resources/views/pages/` (e.g., `resources/views/pages/auth/login-01.blade.php` .. `login-05.blade.php`, `signup-01.blade.php` .. `signup-05.blade.php`).
+1. **Target Directory & Config Mapping:** Save page-level views and multi-variant templates under `resources/views/pages/` (e.g., `resources/views/pages/auth/login-01.blade.php` .. `login-05.blade.php`, `signup-01.blade.php` .. `signup-05.blade.php`) and register active page view mappings in `config/blatui.php` (`pages.auth.*`).
 2. **Source Citation Header:** Add a top-of-file Blade comment citing the official registry source:
    ```blade
    {{-- Source: https://blatui.remix-it.com/r/blocks/login-01.json --}}
